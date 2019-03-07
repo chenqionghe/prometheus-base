@@ -192,8 +192,15 @@ EOF
 ![](readme/.README_images/9d779dd8.png)
 
 
-# 四.配置AlterManager
+# 四.安装AlterManager
+Pormetheus的警告由独立的两部分组成。
+Prometheus服务中的警告规则发送警告到Alertmanager。
+然后这个Alertmanager管理这些警告。包括silencing, inhibition, aggregation，以及通过一些方法发送通知，例如：email，PagerDuty和HipChat。
+建立警告和通知的主要步骤：
+- 创建和配置Alertmanager
+- 启动Prometheus服务时，通过-alertmanager.url标志配置Alermanager地址，以便Prometheus服务能和Alertmanager建立连接。
 
+创建和配置Alertmanager
 ```
 mkdir -p /home/chenqionghe/promethues/alertmanager
 cd !$
