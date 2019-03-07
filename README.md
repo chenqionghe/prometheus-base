@@ -41,6 +41,8 @@ Prometheus的基本原理是通过HTTP协议周期性抓取被监控组件的状
 - 1.安装Server
 - 2.演示golang和node-exporter提供metrics接口
 - 3.演示pushgateway的使用
+- 4.演示grafana的使用
+- 5.演示alertmanager的使用
 
 ## 安装准备
 这里我的IP是10.211.55.25，登入，建立相应文件夹
