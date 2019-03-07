@@ -38,6 +38,10 @@ Prometheus的基本原理是通过HTTP协议周期性抓取被监控组件的状
 - Push Gateway 支持临时性Job主动推送指标的中间网关。
 
 
+## 入门简介
+- 1.安装Server
+- 2.演示golang和node-exporter提供metrics接口
+- 3.演示pushgateway的使用
 
 ## 安装准备
 这里我的IP是10.211.55.25，登入，建立相应文件夹
@@ -48,9 +52,10 @@ mkdir -p /home/chenqionghe/promethues/client
 ```
 下面开始三大套件的学习
 
-# 1.安装Server
+# 一.安装Prometheus Server
 通过docker方式
 首先创建一个配置文件/home/chenqionghe/test/prometheus/prometheus.yml
+挂载之前需要改变文件权限为777，要不会引起修改宿主机上的文件 会引起内容不同步的问题
 ```
 global:
   scrape_interval:     15s # 默认抓取间隔, 15秒向目标抓取一次数据。
@@ -86,7 +91,7 @@ prom/prometheus:v2.7.2 \
 ![](readme/.README_images/7f53b428.png)
 
 
-# 准备Client
+# 二.安装客户端提供metrics接口
 ## 1.通过golang客户端提供metrics
 
 ```
@@ -106,13 +111,13 @@ go get -u -v github.com/prometheus/client_golang/prometheus
 #编译
 cd $GOPATH/src/client_golang/examples/random
 go build -o random main.go
-```
+````
 运行3个示例metrics接口
-```
+````
 ./random -listen-address=:8080 &
 ./random -listen-address=:8081 &
-./random -listen-address=:8082 &```
-```
+./random -listen-address=:8082 &
+````
 
 ## 2.通过node exporter提供metrics
 ```
@@ -124,11 +129,73 @@ prom/node-exporter
 
 然后把这两些接口再次配置到prometheus.yml, 重新载入配置curl -X POST http://localhost:9090/-/reload
 ```
+global:
+  scrape_interval:     15s # 默认抓取间隔, 15秒向目标抓取一次数据。
+  external_labels:
+    monitor: 'codelab-monitor'
+rule_files:
+  #- 'prometheus.rules'
+# 这里表示抓取对象的配置
+scrape_configs:
+  #这个配置是表示在这个配置内的时间序例，每一条都会自动添加上这个{job_name:"prometheus"}的标签  - job_name: 'prometheus'
+  - job_name: 'prometheus'
+    scrape_interval: 5s # 重写了全局抓取间隔时间，由15秒重写成5秒
+    static_configs:
+      - targets: ['localhost:9090']
+      - targets: ['http://10.211.55.25:8080', 'http://10.211.55.25:8081','http://10.211.55.25:8082']
+        labels:
+          group: 'client-golang'
+      - targets: ['http://10.211.55.25:9100']
+        labels:
+          group: 'client-node-exporter'
+
 
 ```
+可以看到接口都生效了
+![](readme/.README_images/3a28db19.png)
+prometheus还提供了各种exporter工具，感兴趣可以去研究一下
 
 
 
+# 三.安装pushgateway
+是为了允许临时作业和批处理作业向普罗米修斯公开他们的指标。
+由于这类作业的存在时间可能不够长, 无法抓取刮, 因此它们可以将指标推送到推网关中。
+Prometheus采集数据是用的pull也就是拉模型，这从我们刚才设置的5秒参数就能看出来。但是有些数据并不适合采用这样的方式，对这样的数据可以使用Push Gateway服务。
+它就相当于一个缓存，当数据采集完成之后，就上传到这里，由Prometheus稍后再pull过来。
+我们来试一下，首先启动Push Gateway
+```
+mkdir -p /home/chenqionghe/promethues/pushgateway
+cd !$
+docker run -d -p 9091:9091 --name pushgateway prom/pushgateway
+```
+访问http://10.211.55.25:9091 已经pushgateway运行起来了
+![](readme/.README_images/6bc9174b.png)
+
+接下来我们就可以往pushgateway推送数据了，prometheus提供了多种语言的sdk，最简单的方式就是通过shell
+1.推送一个指标
+```
+echo "cqh_metric 3.14" | curl --data-binary @- http://ubuntu-linux:9091/metrics/job/cqh
+```
+2.推送多个
+```
+cat <<EOF | curl --data-binary @- http://10.211.55.25:9091/metrics/job/cqh/instance/test
+# 锻炼场所价格
+muscle_metric{label="gym"} 8800
+# 三大项数据 kg
+bench_press 100
+dead_lift 160
+deep_squal 160
+EOF
+```
+然后我们再将pushgateway配置到prometheus.yml里边,重载配置
+看到已经可以搜索出刚刚推送的指标了
+![](readme/.README_images/9d779dd8.png)
 
 
+# 四.配置AlterManager
+
+```
+mkdir -p /home/chenqionghe/promethues/alertmanager
+cd !$
+```
 
