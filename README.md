@@ -17,7 +17,6 @@ Prometheus和Heapster(Heapster是K8S的一个子项目，用于获取集群的�
 - 支持多种多样的图表和界面展示，比如Grafana等。
 
 官网地址：https://prometheus.io/
-架构
 
 # 架构图
 ![](readme/.README_images/585afe46.png)
@@ -39,13 +38,15 @@ Prometheus的基本原理是通过HTTP协议周期性抓取被监控组件的状
 - Push Gateway 支持临时性Job主动推送指标的中间网关。
 
 
-### 服务器准备
+
+## 安装准备
 这里我的IP是10.211.55.25，登入，建立相应文件夹
 ```
 mkdir -p /home/chenqionghe/promethues
 mkdir -p /home/chenqionghe/promethues/server
 mkdir -p /home/chenqionghe/promethues/client
 ```
+下面开始三大套件的学习
 
 # 1.安装Server
 通过docker方式
@@ -64,11 +65,16 @@ scrape_configs:
 ```
 运行
 ```
-docker run --name=prometheus \
+docker run --name=prometheus -d \
 -p 9090:9090 \
 -v /home/chenqionghe/promethues/server/prometheus.yml:/etc/prometheus/prometheus.yml \
-prom/prometheus:v2.7.2
+prom/prometheus:v2.7.2 \
+--config.file=/etc/prometheus/prometheus.yml \
+--web.enable-lifecycle
 ```
+启动时加上--web.enable-lifecycle启用远程热加载配置文件
+调用指令是curl -X POST http://localhost:9090/-/reload
+
 访问http://10.211.55.25:9090
 我们会看到如下l界面
 ![](readme/.README_images/a61313c3.png)
@@ -76,11 +82,50 @@ prom/prometheus:v2.7.2
 ![](readme/.README_images/6ac36cac.png)
 
 我们配置了9090端口，默认prometheus会抓取自己的/metrics接口
+在Graph选项已经可以看到监控的数据
+![](readme/.README_images/7f53b428.png)
 
 
+# 准备Client
+## 1.通过golang客户端提供metrics
 
+```
+mkdir -p /home/chenqionghe/promethues/client/golang/src
+cd !$
+export GOPATH=/home/chenqionghe/promethues/client/golang/
+#克隆项目
+git clone https://github.com/prometheus/client_golang.git
+#安装需要翻墙的第三方包
+mkdir -p $GOPATH/src/golang.org/x/
+cd !$
+git clone https://github.com/golang/net.git
+git clone https://github.com/golang/sys.git
+git clone https://github.com/golang/tools.git
+#安装必要软件包
+go get -u -v github.com/prometheus/client_golang/prometheus
+#编译
+cd $GOPATH/src/client_golang/examples/random
+go build -o random main.go
+```
+运行3个示例metrics接口
+```
+./random -listen-address=:8080 &
+./random -listen-address=:8081 &
+./random -listen-address=:8082 &```
+```
 
+## 2.通过node exporter提供metrics
+```
+docker run -d \
+--name=node-exporter \
+-p 9100:9100 \
+prom/node-exporter
+```
 
+然后把这两些接口再次配置到prometheus.yml, 重新载入配置curl -X POST http://localhost:9090/-/reload
+```
+
+```
 
 
 

@@ -11,3 +11,9 @@ scrape_configs:
     scrape_interval: 5s # 重写了全局抓取间隔时间，由15秒重写成5秒
     static_configs:
       - targets: ['localhost:9090']
+      - targets: ['localhost:8080', 'localhost:8081','localhost:8082']
+        labels:
+          group: 'client-golang'
+      - targets: ['localhost:9100']
+        labels:
+          group: 'client-node-exporter'
