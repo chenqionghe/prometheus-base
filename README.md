@@ -158,8 +158,8 @@ prometheus还提供了各种exporter工具，感兴趣可以去研究一下
 
 
 # 三.安装pushgateway
-是为了允许临时作业和批处理作业向普罗米修斯公开他们的指标。
-由于这类作业的存在时间可能不够长, 无法抓取刮, 因此它们可以将指标推送到推网关中。
+pushgateway是为了允许临时作业和批处理作业向普罗米修斯公开他们的指标。
+由于这类作业的存在时间可能不够长, 无法抓取到, 因此它们可以将指标推送到推网关中。
 Prometheus采集数据是用的pull也就是拉模型，这从我们刚才设置的5秒参数就能看出来。但是有些数据并不适合采用这样的方式，对这样的数据可以使用Push Gateway服务。
 它就相当于一个缓存，当数据采集完成之后，就上传到这里，由Prometheus稍后再pull过来。
 我们来试一下，首先启动Push Gateway
@@ -172,11 +172,12 @@ docker run -d -p 9091:9091 --name pushgateway prom/pushgateway
 ![](readme/.README_images/6bc9174b.png)
 
 接下来我们就可以往pushgateway推送数据了，prometheus提供了多种语言的sdk，最简单的方式就是通过shell
-1.推送一个指标
+
+* 推送一个指标
 ```
 echo "cqh_metric 3.14" | curl --data-binary @- http://ubuntu-linux:9091/metrics/job/cqh
 ```
-2.推送多个
+* 推送多个指标
 ```
 cat <<EOF | curl --data-binary @- http://10.211.55.25:9091/metrics/job/cqh/instance/test
 # 锻炼场所价格
