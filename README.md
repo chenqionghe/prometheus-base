@@ -194,7 +194,18 @@ EOF
 ![](readme/.README_images/9d779dd8.png)
 
 
-# 四.安装AlterManager
+# 四.安装Grafana展示
+Grafana是用于可视化大型测量数据的开源程序，它提供了强大和优雅的方式去创建、共享、浏览数据。
+Dashboard中显示了你不同metric数据源中的数据。
+Grafana最常用于因特网基础设施和应用分析，但在其他领域也有用到，比如：工业传感器、家庭自动化、过程控制等等。
+Grafana支持热插拔控制面板和可扩展的数据源，目前已经支持Graphite、InfluxDB、OpenTSDB、Elasticsearch、Prometheus等。
+
+
+
+
+
+
+# 五.安装AlterManager
 Pormetheus的警告由独立的两部分组成。
 Prometheus服务中的警告规则发送警告到Alertmanager。
 然后这个Alertmanager管理这些警告。包括silencing, inhibition, aggregation，以及通过一些方法发送通知，例如：email，PagerDuty和HipChat。
