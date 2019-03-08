@@ -200,7 +200,27 @@ Dashboard中显示了你不同metric数据源中的数据。
 Grafana最常用于因特网基础设施和应用分析，但在其他领域也有用到，比如：工业传感器、家庭自动化、过程控制等等。
 Grafana支持热插拔控制面板和可扩展的数据源，目前已经支持Graphite、InfluxDB、OpenTSDB、Elasticsearch、Prometheus等。
 
+我们使用docker安装
+```
+docker run -d -p 3000:3000 --name grafana grafana/grafana
+```
+默认登录账户和密码都是admin，进入后界面如下
+![](readme/.README_images/509e0875.png)
+我们添加一个数据源
+![](readme/.README_images/88c14f2a.png)
+把Prometheus的地址填上
+![](readme/.README_images/d745bd86.png)
+导入prometheus的模板
+![](readme/.README_images/46362ffe.png)
+打开左上角选择已经导入的模板会看到已经有各种图
+![](readme/.README_images/b1a06f73.png)
 
+我们来添加一个自己的图表
+![](readme/.README_images/21bc3564.png)
+![](readme/.README_images/2baa812d.png)
+![](readme/.README_images/efeecac0.png)
+指定自己想看的图标和关键字，右上角保存
+![](readme/.README_images/77e93ebc.png)
 
 
 
