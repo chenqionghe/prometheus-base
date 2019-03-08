@@ -1,4 +1,4 @@
-# Prometheus搭建监控报警系统
+# 从零搭建Prometheus监控报警系统
 
 ## 什么是Prometheus?
 Prometheus是由SoundCloud开发的开源监控报警系统和时序列数据库(TSDB)。Prometheus使用Go语言开发，是Google BorgMon监控系统的开源版本。
@@ -36,10 +36,9 @@ Prometheus的基本原理是通过HTTP协议周期性抓取被监控组件的状
 - Alertmanager 警告管理器，用来进行报警。
 - Push Gateway 支持临时性Job主动推送指标的中间网关。
 
-
-## 入门简介
-- 1.安装Server
-- 2.演示golang和node-exporter提供metrics接口
+## 本教程由步骤简介
+- 1.演示安装Prometheus Server
+- 2.演示通过golang和node-exporter提供metrics接口
 - 3.演示pushgateway的使用
 - 4.演示grafana的使用
 - 5.演示alertmanager的使用
