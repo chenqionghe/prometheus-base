@@ -3,7 +3,7 @@ global:
   external_labels:
     monitor: 'codelab-monitor'
 rule_files:
-  #- 'prometheus.rules'
+  - /etc/prometheus/rules.yml
 # 这里表示抓取对象的配置
 scrape_configs:
   #这个配置是表示在这个配置内的时间序例，每一条都会自动添加上这个{job_name:"prometheus"}的标签  - job_name: 'prometheus'
@@ -20,3 +20,7 @@ scrape_configs:
       - targets: ['10.211.55.25:9091']
         labels:
           group: 'pushgateway'
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["10.211.55.2:9093"]

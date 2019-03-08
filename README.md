@@ -50,6 +50,8 @@ Prometheus的基本原理是通过HTTP协议周期性抓取被监控组件的状
 mkdir -p /home/chenqionghe/promethues
 mkdir -p /home/chenqionghe/promethues/server
 mkdir -p /home/chenqionghe/promethues/client
+touch /home/chenqionghe/promethues/server/rules.yml
+chmod 777 /home/chenqionghe/promethues/server/rules.yml
 ```
 下面开始三大套件的学习
 
@@ -71,9 +73,11 @@ scrape_configs:
 ```
 运行
 ```
+docker rm -f prometheus
 docker run --name=prometheus -d \
 -p 9090:9090 \
 -v /home/chenqionghe/promethues/server/prometheus.yml:/etc/prometheus/prometheus.yml \
+-v /home/chenqionghe/promethues/server/rules.yml:/etc/prometheus/rules.yml \
 prom/prometheus:v2.7.2 \
 --config.file=/etc/prometheus/prometheus.yml \
 --web.enable-lifecycle
@@ -240,4 +244,53 @@ Prometheus服务中的警告规则发送警告到Alertmanager。
 mkdir -p /home/chenqionghe/promethues/alertmanager
 cd !$
 ```
+创建配置文件alertmanager.yml
+```
+global:
+  resolve_timeout: 5m
+route:
+  group_by: ['cqh']
+  group_wait: 10s #组报警等待时间
+  group_interval: 10s #组报警间隔时间
+  repeat_interval: 1m #重复报警间隔时间
+  receiver: 'web.hook'
+receivers:
+  - name: 'web.hook'
+    webhook_configs:
+      - url: 'http://10.211.55.2:8888/open/test'
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'dev', 'instance']
+```
+这里配置成了web.hook的方式，当server通知alertmanager会自动调用webhook http://10.211.55.2:8888/open/test
 
+下面运行altermanager
+```
+docker rm -f alertmanager
+docker run -d -p 9093:9093 \
+--name alertmanager \
+-v /home/chenqionghe/promethues/alertmanager/alertmanager.yml:/etc/alertmanager/config.yml \
+prom/alertmanager
+```
+访问http://10.211.55.25:9093
+![](readme/.README_images/bf04df59.png)
+
+接下来修改Server端配置报警规则和altermanager地址
+
+修改规则/home/chenqionghe/promethues/server/rules.yml
+```
+groups:
+  - name: cqh
+    rules:
+      - alert: cqh测试
+        expr: grafana_alerting_active_alerts == 0
+        for: 1m
+        labels:
+          status: warning
+        annotations:
+          summary: "{{$labels.instance}}:测试"
+          description: "{{$labels.instance}}:测试"
+```
