@@ -1,0 +1,11 @@
+groups:
+  - name: cqh
+    rules:
+      - alert: cqh测试
+        expr: grafana_alerting_active_alerts == 0
+        for: 1m
+        labels:
+          status: warning
+        annotations:
+          summary: "{{$labels.instance}}:测试"
+          description: "{{$labels.instance}}:测试"

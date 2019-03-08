@@ -224,6 +224,7 @@ docker run -d -p 3000:3000 --name grafana grafana/grafana
 看到如下数据
 ![](readme/.README_images/aff653e4.png)
 
+到这里我们就已经实现了数据的自动收集和展示，下面来说下prometheus如何自动报警
 
 
 # 五.安装AlterManager
