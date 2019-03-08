@@ -23,4 +23,4 @@ scrape_configs:
 alerting:
   alertmanagers:
     - static_configs:
-        - targets: ["10.211.55.2:9093"]
+        - targets: ["10.211.55.25:9093"]

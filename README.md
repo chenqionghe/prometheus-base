@@ -294,6 +294,35 @@ groups:
           description: "{{$labels.instance}}:硬拉超标！lightweight baby!!!"
 ```
 这条规则的意思是，硬拉超过150公斤，持续一分钟，就报警通知
+然后再修改prometheus添加altermanager配置
+```
+global:
+  scrape_interval:     15s # 默认抓取间隔, 15秒向目标抓取一次数据。
+  external_labels:
+    monitor: 'codelab-monitor'
+rule_files:
+  - /etc/prometheus/rules.yml
+# 这里表示抓取对象的配置
+scrape_configs:
+  #这个配置是表示在这个配置内的时间序例，每一条都会自动添加上这个{job_name:"prometheus"}的标签  - job_name: 'prometheus'
+  - job_name: 'prometheus'
+    scrape_interval: 5s # 重写了全局抓取间隔时间，由15秒重写成5秒
+    static_configs:
+      - targets: ['localhost:9090']
+      - targets: ['10.211.55.25:8080', '10.211.55.25:8081','10.211.55.25:8082']
+        labels:
+          group: 'client-golang'
+      - targets: ['10.211.55.25:9100']
+        labels:
+          group: 'client-node-exporter'
+      - targets: ['10.211.55.25:9091']
+        labels:
+          group: 'pushgateway'
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["10.211.55.25:9093"]
+```
 重载prometheus配置，规则就已经生效
 接下来我们观察grafana中数据的变化
 ![](readme/.README_images/79a21625.png)
@@ -303,3 +332,10 @@ groups:
 ![](readme/.README_images/c34d9dcb.png)
 
 然后我们再来看看提供的webhook接口，这里的接口我是用的golang写的，接到数据后将body内容报警到钉钉
+![](readme/.README_images/d3e9b876.png)
+钉钉收到报警内容如下
+![](readme/.README_images/2b677ef0.png)
+
+
+
+到这里，从零开始搭建Prometheus实现自动监控报警就说介绍完了
