@@ -24,3 +24,4 @@ alerting:
   alertmanagers:
     - static_configs:
         - targets: ["10.211.55.25:9093"]
+

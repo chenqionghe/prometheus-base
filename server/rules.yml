@@ -1,0 +1,11 @@
+groups:
+  - name: cqh
+    rules:
+      - alert: cqh测试
+        expr: dead_lift > 150
+        for: 1m
+        labels:
+          status: warning
+        annotations:
+          summary: "{{$labels.instance}}:硬拉超标！lightweight baby!!!"
+          description: "{{$labels.instance}}:硬拉超标！lightweight baby!!!"

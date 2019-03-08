@@ -36,7 +36,7 @@ Prometheus的基本原理是通过HTTP协议周期性抓取被监控组件的状
 - Alertmanager 警告管理器，用来进行报警。
 - Push Gateway 支持临时性Job主动推送指标的中间网关。
 
-## 本教程由步骤简介
+## 本雪山飞主教程内容简介
 - 1.演示安装Prometheus Server
 - 2.演示通过golang和node-exporter提供metrics接口
 - 3.演示pushgateway的使用
