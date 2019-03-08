@@ -272,25 +272,34 @@ inhibit_rules:
 docker rm -f alertmanager
 docker run -d -p 9093:9093 \
 --name alertmanager \
--v /home/chenqionghe/promethues/alertmanager/alertmanager.yml:/etc/alertmanager/config.yml \
+-v /home/chenqionghe/promethues/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml \
 prom/alertmanager
 ```
 访问http://10.211.55.25:9093
 ![](readme/.README_images/bf04df59.png)
 
 接下来修改Server端配置报警规则和altermanager地址
-
 修改规则/home/chenqionghe/promethues/server/rules.yml
 ```
 groups:
   - name: cqh
     rules:
       - alert: cqh测试
-        expr: grafana_alerting_active_alerts == 0
+        expr: dead_lift > 150
         for: 1m
         labels:
           status: warning
         annotations:
-          summary: "{{$labels.instance}}:测试"
-          description: "{{$labels.instance}}:测试"
+          summary: "{{$labels.instance}}:硬拉超标！lightweight baby!!!"
+          description: "{{$labels.instance}}:硬拉超标！lightweight baby!!!"
 ```
+这条规则的意思是，硬拉超过150公斤，持续一分钟，就报警通知
+重载prometheus配置，规则就已经生效
+接下来我们观察grafana中数据的变化
+![](readme/.README_images/79a21625.png)
+然后我们点击prometheus的Alert模块，会看到已经由绿->黄-红，触发了报警
+![](readme/.README_images/46d3609e.png)
+![](readme/.README_images/f1a811cd.png)
+![](readme/.README_images/c34d9dcb.png)
+
+然后我们再来看看提供的webhook接口，这里的接口我是用的golang写的，接到数据后将body内容报警到钉钉

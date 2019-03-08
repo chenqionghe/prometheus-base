@@ -4,7 +4,7 @@ route:
   group_by: ['cqh']
   group_wait: 10s #组报警等待时间
   group_interval: 10s #组报警间隔时间
-  repeat_interval: 1h #重复报警间隔时间
+  repeat_interval: 1m #重复报警间隔时间
   receiver: 'web.hook'
 receivers:
   - name: 'web.hook'
