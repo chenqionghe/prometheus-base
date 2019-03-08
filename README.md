@@ -221,7 +221,8 @@ docker run -d -p 3000:3000 --name grafana grafana/grafana
 ![](readme/.README_images/efeecac0.png)
 指定自己想看的图标和关键字，右上角保存
 ![](readme/.README_images/77e93ebc.png)
-
+看到如下数据
+![](readme/.README_images/aff653e4.png)
 
 
 
